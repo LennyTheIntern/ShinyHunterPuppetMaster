@@ -1,0 +1,9 @@
+# created by virtualenv automatically
+Scripts/
+share/
+Lib/
+.vscode/
+.pytest_cache/
+img_bank/*
+*__pycache__/
+*.bmp
