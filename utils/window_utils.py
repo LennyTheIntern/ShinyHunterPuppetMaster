@@ -1,13 +1,13 @@
 #%%
 import re
+import time
 import win32gui, win32ui , win32con, win32api
 import numpy as np
 from dataclasses import dataclass, field ,fields
 import cv2
-from matplotlib import pyplot as plt
 
 @dataclass
-class Window:
+class MyWindow:
     """
     Dataclass for window.
     """    
@@ -47,27 +47,25 @@ class Window:
         # cut off the alpha channel
         # img = img[:,:,:3]
         return img
-
-def screenshot_window(window:Window,dest:str = 'img_bank/'):
-    # save numpy array as bmp file
-    # window.np_bitmap.save(f'{dest}pic_{window.text}_{window.hwnd}.bmp')
-    # save nuympy array as png file
-    plt.imsave(f"{dest}'pic_{window.text}_{window.hwnd}.png'",window.np_bitmap) 
-
-def send_input_to_window(window:Window,keys:str):
-    """
-    Send input to the specified window.
-
-    Args:
-        window (Window): Window to send input to.
-        keys (str): Keys to send to the window.
-    """
-    win32gui.SetForegroundWindow(window.hwnd)
-    for key in keys:
-        win32api.keybd_event(ord(key), 0, 0, 0)
-        win32api.keybd_event(ord(key), 0, win32con.KEYEVENTF_KEYUP, 0)
+    
 
 
+def set_foreground_window(win:MyWindow):
+    """Bring the window with the given title to the front."""
+    win32gui.SetForegroundWindow(win.hwnd)
+
+def send_input_to_window(win:MyWindow, message):
+    print(win)
+    for char in message:
+        print(char)
+        if char == '\n':
+            win32gui.SendMessage(win.hwnd, win32con.WM_KEYDOWN, win32con.VK_RETURN, None)
+            
+            time.sleep(0.1)
+            win32gui.SendMessage(win.hwnd, win32con.WM_KEYUP, win32con.VK_RETURN, None)
+        else:
+            win32gui.SendMessage(win.hwnd, win32con.WM_CHAR, ord(char), None)
+        time.sleep(0.1) 
 # %%
 def list_visable_windows():
     """
@@ -76,7 +74,7 @@ def list_visable_windows():
     win_list = []
     def winEnumHandler(hwnd, ctx):
         if win32gui.IsWindowVisible(hwnd):
-            win_list.append(Window(hwnd))
+            win_list.append(MyWindow(hwnd))
             # print(hex(hwnd), win32gui.GetWindowText(hwnd))
     win32gui.EnumWindows(winEnumHandler, None)
     #remove empty strings
@@ -194,7 +192,7 @@ def grab_screen():
 #     # img = img[:,:,:3]
 #     return img
     
-def grab_save_window_screenshot(window:Window,dest:str = 'img_bank/'):
+def grab_save_window_screenshot(window:MyWindow,dest:str = 'img_bank/'):
     
     """
     Grab a screenshot of the current window.
