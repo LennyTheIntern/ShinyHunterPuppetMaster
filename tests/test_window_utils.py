@@ -2,10 +2,11 @@
 # ------------------------------------------------
 #%%
 import pytest
-from utils.window_utils import list_visable_windows,Window,screenshot_window,send_input_to_window
+from utils.window_utils import list_visable_windows,send_input_to_window
 import win32gui, win32ui , win32con, win32api
 import numpy as np
 from dataclasses import dataclass
+
 import cv2
 #%%
 
@@ -29,6 +30,25 @@ def test_grab_screen_cv2():
             go = False
             cv2.destroyAllWindows()
     assert True
+    
+# this will open a open cv window with the screen and wait for a key press
+# and it will control the window it is attached to
+def windowclone_test():
+    """
+    Test grab_screen() function.
+    """
+    
+    go = True
+    #136302
+    ls = list_visable_windows()
+    win:Window = ls[5]
+    while go:
+        cv2.imshow(win.text, win.np_bitmap)
+        wait = cv2.waitKey(100)
+        if wait == ord('q'):
+            go = False
+            cv2.destroyAllWindows()
+    assert True
 # %%
 def test_send_input():
-    send_input_to_window(Window(136302),'z')    
+    send_input_to_window(Window(136302),'z')
